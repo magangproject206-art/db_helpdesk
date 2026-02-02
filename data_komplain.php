@@ -21,18 +21,23 @@
                 </thead>
                 <tbody>
                     <?php
-                    $q = mysqli_query($conn, "SELECT chat.*, bpr.nama_bpr FROM chat JOIN bpr ON chat.id_bpr = bpr.id_bpr");
-                    while($d = mysqli_fetch_array($q)){
-                        $color = ($d['status']=='C'?'secondary':($d['status']=='O'?'primary':($d['status']=='U'?'danger':'success')));
+                    $id_user = $_SESSION['id_user'];
+                    $role = $_SESSION['role'];
+
+                    if($role == 'bpr') {
+                        // BPR hanya melihat komplain yang id_bpr-nya adalah milik dia sendiri
+                        $sql = "SELECT chat.*, bpr.nama_bpr FROM chat 
+                                JOIN bpr ON chat.id_bpr = bpr.id_bpr 
+                                WHERE chat.id_bpr = '$id_user'
+                                ORDER BY chat.timestamp DESC";
+                    } else {
+                        // Pegawai, Admin, Supervisor melihat SEMUA komplain (seperti pemilik akun WA)
+                        $sql = "SELECT chat.*, bpr.nama_bpr FROM chat 
+                                JOIN bpr ON chat.id_bpr = bpr.id_bpr 
+                                ORDER BY chat.timestamp DESC";
+                    }
+                    $res = mysqli_query($conn, $sql);
                     ?>
-                    <tr>
-                        <td>#<?php echo $d['id_chat']; ?></td>
-                        <td><?php echo $d['nama_bpr']; ?></td>
-                        <td><?php echo $d['judul_masalah']; ?></td>
-                        <td><span class="badge badge-<?php echo $color; ?>"><?php echo $d['status']; ?></span></td>
-                        <td><a href="detail_chat.php?id=<?php echo $d['id_chat']; ?>" class="btn btn-sm btn-info">Detail Chat</a></td>
-                    </tr>
-                    <?php } ?>
                 </tbody>
             </table>
         </div>
