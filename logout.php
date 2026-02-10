@@ -1,5 +1,9 @@
 <?php
+
 session_start();
-session_destroy(); // Menghapus semua data login
-header("location:index.php"); // Kembali ke halaman login
+$_SESSION = array();
+session_destroy();
+
+header("Location: index.php");
+exit();
 ?>
